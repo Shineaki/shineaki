@@ -22,16 +22,15 @@ CONTAINER_ID = settings['container_id']
 client = cosmos_client.CosmosClient(HOST, {'masterKey': MASTER_KEY} )
 db = client.create_database_if_not_exists(id=DATABASE_ID)
 container = db.create_container_if_not_exists(id=CONTAINER_ID, partition_key=PartitionKey(path='/id', kind='Hash'))
-tst = list(container.read_all_items())
-from flask import Flask
+tst = list(container.read_item(partition_key="msc", item="502bea35-5b07-4c3b-8011-6cf9ed89b7f7"))
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def hello_world():
-    name = os.environ.get("NAME",tst[0]["id"])
-    return f"Hello {name}!"
+    return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=False)
